@@ -1,0 +1,95 @@
+<%inherit file="../base.html" />
+<%! from django.shortcuts import reverse %>
+
+<%def name="title()">外链视频</%def>
+<%def name="css()">
+<link href="/static/dashboard/css/externa_video.css" rel="stylesheet" type="text/css">
+</%def>
+<%def name="content()">
+<%
+from app.model.video import VideoType,FromType,NationalityType
+%>
+<h1>外链视频</h1>
+<button class='btn btn-info open-btn' id="open-add-video-btn">创建</button>
+<form id="edit-area" class="add-video-area" action="" method="post">
+  ${csrf_token}
+  <div class="form-group">
+    <input type="text" class="form-control" name="image" id="" placeholder="海报">
+  </div>
+  <div class="form-group">
+    <input type="text" class="form-control" name="name" id="" placeholder="视频名称">
+  </div>
+  <div class="form-group">
+      <textarea class="form-control" name="info" id="" placeholder="视频简介"></textarea>
+  </div>
+  <div class="form-group">
+  <label>视频类型：</label>
+   <select class="form-control video-select" name="video_type">
+    % for video_type in VideoType:
+      <option value="${video_type.value}">${video_type.label}</option>
+    % endfor
+  </select>
+  </div>
+  <div class="form-group">
+  <label>视频来源：</label>
+   <select class="form-control video-select" name="from_to">
+    % for from_type in FromType:
+       % if from_type != FromType('custom'):
+      <option value="${from_type.value}">${from_type.label}</option>
+       % endif
+    % endfor
+  </select>
+  </div>
+  <div class="form-group">
+  <label>地区：&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</label>
+   <select class="form-control video-select" name="nationality">
+    % for nationality_type in NationalityType:
+      <option value="${nationality_type.value}">${nationality_type.label}</option>
+    % endfor
+  </select>
+  </div>
+    <button type="submit" class="btn   btn-info">添加</button><span>${error}</span>
+</form>
+<table class="table" id="table-t">
+    <thead>
+        <tr>
+            <th>名称</th>
+            <th>海报</th>
+            <th>视频类型</th>
+            <th>视频来源</th>
+            <th>地区</th>
+            <th>简介</th>
+            <th>状态</th>
+            <th>创建时间</th>
+            <th>修改时间</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+        % for video in videos:
+        <tr>
+            <td>${video.name}</td>
+            <td><img class="video-image" src="${video.image}" /></td>
+            <td>${VideoType(video.video_type).label}</td>
+            <td>${FromType(video.from_to).label}</td>
+            <td>${NationalityType(video.nationality).label}</td>
+            <td><p class="info">${video.info}</p></td>
+            <td>${video.status}</td>
+            <td>${video.created_time}</td>
+            <td>${video.update_time}</td>
+            <td><a href="#">编辑</a>|<a href="${reverse('video_sub', kwargs={'video_id':video.id})}">附属信息</a></td>
+        </tr>
+        % endfor
+    </tbody>
+</table>
+</%def>
+<%def name="js()">
+<script src="/static/dashboard/js/video/extena_video.js"></script>
+<script>
+    var string = "${error}"
+    if(string.length!=0){
+        videoEditArea.show();
+        videoEreaStatic = true;
+    }
+</script>
+</%def>
